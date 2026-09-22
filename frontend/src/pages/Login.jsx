@@ -1,9 +1,63 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Eye, EyeOff, Shield, ArrowLeft } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  Eye,
+  EyeOff,
+  Shield,
+  ArrowLeft,
+  AlertCircle,
+} from "lucide-react";
 
 function Login() {
+  const navigate = useNavigate();
+
   const [showPassword, setShowPassword] = useState(false);
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [error, setError] = useState("");
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    setError("");
+
+    // Check empty fields
+    if (!email.trim() || !password.trim()) {
+      setError("Please enter your email and password.");
+      return;
+    }
+
+    // Temporary frontend login
+    // We will replace this with backend authentication later.
+    if (
+      email.toLowerCase() === "admin@cloudguard.com" &&
+      password === "admin123"
+    ) {
+      // Store temporary login state
+      localStorage.setItem(
+        "cloudguard_user",
+        JSON.stringify({
+          name: "Security Admin",
+          email: "admin@cloudguard.com",
+          role: "Security Admin",
+        })
+      );
+
+      localStorage.setItem(
+        "cloudguard_token",
+        "demo-login-token"
+      );
+
+      // Go to dashboard
+      navigate("/dashboard");
+    } else {
+      setError(
+        "Invalid email or password. Use the demo credentials shown below."
+      );
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -42,6 +96,7 @@ function Login() {
 
           {/* Card */}
           <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-8 shadow-2xl shadow-blue-950/20">
+            {/* Heading */}
             <div className="mb-8">
               <h2 className="text-2xl font-bold">
                 Welcome back
@@ -52,7 +107,43 @@ function Login() {
               </p>
             </div>
 
-            <form className="space-y-5">
+            {/* Demo Credentials */}
+            <div className="mb-5 rounded-xl border border-blue-400/10 bg-blue-400/[0.03] p-4">
+              <p className="text-xs font-semibold text-blue-400">
+                Demo Login
+              </p>
+
+              <p className="mt-2 text-xs text-slate-500">
+                Email:{" "}
+                <span className="text-slate-300">
+                  admin@cloudguard.com
+                </span>
+              </p>
+
+              <p className="mt-1 text-xs text-slate-500">
+                Password:{" "}
+                <span className="text-slate-300">
+                  admin123
+                </span>
+              </p>
+            </div>
+
+            {/* Error */}
+            {error && (
+              <div className="mb-5 flex items-start gap-3 rounded-xl border border-red-500/20 bg-red-500/10 p-4">
+                <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-400" />
+
+                <p className="text-sm text-red-300">
+                  {error}
+                </p>
+              </div>
+            )}
+
+            {/* Form */}
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-5"
+            >
               {/* Email */}
               <div>
                 <label
@@ -64,8 +155,14 @@ function Login() {
 
                 <input
                   id="email"
+                  name="email"
                   type="email"
+                  value={email}
+                  onChange={(event) =>
+                    setEmail(event.target.value)
+                  }
                   placeholder="you@example.com"
+                  autoComplete="email"
                   className="w-full rounded-lg border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 transition focus:border-blue-400/50 focus:ring-2 focus:ring-blue-500/10"
                 />
               </div>
@@ -82,17 +179,27 @@ function Login() {
                 <div className="relative">
                   <input
                     id="password"
+                    name="password"
                     type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(event) =>
+                      setPassword(event.target.value)
+                    }
                     placeholder="Enter your password"
+                    autoComplete="current-password"
                     className="w-full rounded-lg border border-white/10 bg-slate-950 px-4 py-3 pr-12 text-sm text-white outline-none placeholder:text-slate-600 transition focus:border-blue-400/50 focus:ring-2 focus:ring-blue-500/10"
                   />
 
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
+                    onClick={() =>
+                      setShowPassword(!showPassword)
+                    }
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 transition hover:text-slate-300"
                     aria-label={
-                      showPassword ? "Hide password" : "Show password"
+                      showPassword
+                        ? "Hide password"
+                        : "Show password"
                     }
                   >
                     {showPassword ? (
@@ -111,18 +218,24 @@ function Login() {
                     type="checkbox"
                     className="h-4 w-4 rounded border-white/20 bg-slate-950 accent-blue-500"
                   />
+
                   Remember me
                 </label>
 
                 <button
                   type="button"
+                  onClick={() =>
+                    setError(
+                      "Password recovery will be connected when the backend authentication system is added."
+                    )
+                  }
                   className="text-sm text-blue-400 transition hover:text-blue-300"
                 >
                   Forgot password?
                 </button>
               </div>
 
-              {/* Login button */}
+              {/* Login */}
               <button
                 type="submit"
                 className="w-full rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-500"
